@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 using UnityEngine.AdaptivePerformance;
-
+using UnityEngine.SceneManagement; 
 public class NewMonoBehaviourScript : MonoBehaviour
 {
     public Rigidbody2D playerRigidbody;
@@ -130,6 +130,10 @@ private void OnTriggerEnter2D(Collider2D other)
             Destroy(other.gameObject);
             IamBig = true;
             GetBig();
+        }
+        if(other.CompareTag("JAM"))
+        {
+              SceneManager.LoadScene("Level2");
         }
     }
 }
