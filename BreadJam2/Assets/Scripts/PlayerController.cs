@@ -104,6 +104,10 @@ public class NewMonoBehaviourScript : MonoBehaviour
         moveInput = -1f;
         isForwardDirection = false;
     }
+    else if (Input.GetKey(KeyCode.R))
+    {
+          SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     else if (Input.GetKey(KeyCode.S))
     {
         if(IamBig == true) 
@@ -133,11 +137,30 @@ private void OnTriggerEnter2D(Collider2D other)
         }
         if(other.CompareTag("JAM"))
         {
-              SceneManager.LoadScene("Level2");
+              goNextLevel();
         }
         if(other.CompareTag("DEAD"))
         {
               SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+    }
+    void goNextLevel()
+    {
+        //SCUFFED lmaoo andrew
+        string nameLevel = SceneManager.GetActiveScene().name;
+
+        if(nameLevel == "Level1")
+        {
+             SceneManager.LoadScene("Level2");
+        }
+         if(nameLevel == "Level2")
+        {
+             SceneManager.LoadScene("Level3");
+        }
+         if(nameLevel == "Level3")
+        {
+             SceneManager.LoadScene("Level1");
+        }
+    
     }
 }
