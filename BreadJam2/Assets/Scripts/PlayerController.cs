@@ -6,10 +6,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
 {
     public Rigidbody2D playerRigidbody;
     public Transform groundCheck;
-    public Transform roofCheck;
-    public Transform shieldTransform;
     public LayerMask groundLayer;
-    public LayerMask roofLayer;
     public SpriteRenderer spriteRenderer;
 
     Vector2 velocity;
@@ -17,13 +14,14 @@ public class NewMonoBehaviourScript : MonoBehaviour
     public bool isGrounded;
     bool isRoof;
     bool isForwardDirection;
-     //How much big character
+
+    //How much big character
     public float scaleMultiplier;
-   public Animator animator;
-   bool  IamBig;
+    public Animator animator;
+    bool  IamBig;
 
     [Header("Sounds")]
-    public AudioSource jump, dash;
+    public AudioSource jump, water, shrink, die;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,91 +41,95 @@ public class NewMonoBehaviourScript : MonoBehaviour
     {
       animator.SetFloat("xVelocity", Mathf.Abs(playerRigidbody.linearVelocity.x));
     }
-  void  GetBig()
-     {
+    void GetBig()
+    {
+         
+       Collider2D col = GetComponent<Collider2D>();
+
+       float heightBefore = col.bounds.size.y; //collider height
+
+       transform.localScale *= scaleMultiplier; //x height
+
+       float heightAfter = col.bounds.size.y;  // collider height after
+       float heightDifference = heightAfter - heightBefore; //collider fixed
+
+      transform.position += new Vector3(0, heightDifference / 2f, 0); //player moves up to it grows up
+
+       playerRigidbody.mass = 5f; // more heavy so it can MOVE STUFF
+
+        //  FIX GROUND CHECK
+        Transform grcheck = transform.Find("GroundCheck");
+        grcheck.localPosition = new Vector3(grcheck.localPosition.x,grcheck.localPosition.y / scaleMultiplier,grcheck.localPosition.z);
+        water.Play();
+    }
+
+    void getSmoll()
+    {
+      Collider2D col = GetComponent<Collider2D>();
+
+       float heightBefore = col.bounds.size.y; ////collider height now
        
-     Collider2D col = GetComponent<Collider2D>();
+       transform.localScale /= scaleMultiplier; // Get Smaller
 
-     float heightBefore = col.bounds.size.y; //collider height
+       float heightAfter = col.bounds.size.y; //Collider heigh now after smaller
 
-     transform.localScale *= scaleMultiplier; //x height
+       float heightDifference = heightBefore - heightAfter;//Differences
 
-     float heightAfter = col.bounds.size.y;  // collider height after
-     float heightDifference = heightAfter - heightBefore; //collider fixed
+        // Move down so feet stay grounded
+       transform.position -= new Vector3(0, heightDifference / 2f, 0);
 
-    transform.position += new Vector3(0, heightDifference / 2f, 0); //player moves up to it grows up
+       // Restore mass
+       playerRigidbody.mass = 0.2f;
 
-     playerRigidbody.mass = 5f; // more heavy so it can MOVE STUFF
+       //Fix groundChek
+       Transform grcheck = transform.Find("GroundCheck");
+        grcheck.localPosition = new Vector3(grcheck.localPosition.x,grcheck.localPosition.y * scaleMultiplier,grcheck.localPosition.z);
 
-      //  FIX GROUND CHECK
-      Transform grcheck = transform.Find("GroundCheck");
-      grcheck.localPosition = new Vector3(grcheck.localPosition.x,grcheck.localPosition.y / scaleMultiplier,grcheck.localPosition.z);
-     }
-
-     void getSmoll()
+        shrink.Play();
+    }
+       
+     
+     void setMovement()
      {
-    Collider2D col = GetComponent<Collider2D>();
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
 
-     float heightBefore = col.bounds.size.y; ////collider height now
-     
-     transform.localScale /= scaleMultiplier; // Get Smaller
+        float moveInput = 0f;
 
-     float heightAfter = col.bounds.size.y; //Collider heigh now after smaller
-
-     float heightDifference = heightBefore - heightAfter;//Differences
-
-      // Move down so feet stay grounded
-     transform.position -= new Vector3(0, heightDifference / 2f, 0);
-
-     // Restore mass
-     playerRigidbody.mass = 0.2f;
-
-     //Fix groundChek
-     Transform grcheck = transform.Find("GroundCheck");
-      grcheck.localPosition = new Vector3(grcheck.localPosition.x,grcheck.localPosition.y * scaleMultiplier,grcheck.localPosition.z);
-     }
-     
-   
-   void setMovement()
-{
-    isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
-
-    float moveInput = 0f;
-
-    if (Input.GetKey(KeyCode.D))
-    {
-        moveInput = 1f;
-        isForwardDirection = true;
-    }
-    else if (Input.GetKey(KeyCode.A))
-    {
-        moveInput = -1f;
-        isForwardDirection = false;
-    }
-    else if (Input.GetKey(KeyCode.R))
-    {
-          SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-    else if (Input.GetKey(KeyCode.S))
-    {
-        if(IamBig == true) 
+        if (Input.GetKey(KeyCode.D))
         {
-        IamBig = false;
-        getSmoll();
-        };
-    }
+            moveInput = 1f;
+            isForwardDirection = true;
+        }
+        else if (Input.GetKey(KeyCode.A))
+        {
+            moveInput = -1f;
+            isForwardDirection = false;
+        }
+        else if (Input.GetKey(KeyCode.R))
+        {
+              SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            if(IamBig == true) 
+            {
+            IamBig = false;
+            getSmoll();
+            };
+        }
 
-    playerRigidbody.linearVelocity = new Vector2(moveInput * 5f, playerRigidbody.linearVelocity.y);
+        playerRigidbody.linearVelocity = new Vector2(moveInput * 5f, playerRigidbody.linearVelocity.y);
 
-    spriteRenderer.flipX = !isForwardDirection;
+        spriteRenderer.flipX = !isForwardDirection;
 
-    if (Input.GetKeyDown(KeyCode.W) && isGrounded)
-    {
-        playerRigidbody.linearVelocity = new Vector2(playerRigidbody.linearVelocity.x, 10f);
-    }
-}
+        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
+        {
+            jump.Play();
+            playerRigidbody.linearVelocity = new Vector2(playerRigidbody.linearVelocity.x, 10f);
+        }
+     }
 
-private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Water"))
         {
@@ -141,7 +143,8 @@ private void OnTriggerEnter2D(Collider2D other)
         }
         if(other.CompareTag("DEAD"))
         {
-              SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            die.Play();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
     void goNextLevel()
