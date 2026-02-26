@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Water
   - BOX
+  - JAM
   layers:
   - Default
   - TransparentFX
