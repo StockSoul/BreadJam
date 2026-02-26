@@ -161,6 +161,10 @@ private void OnTriggerEnter2D(Collider2D other)
         {
              SceneManager.LoadScene("Level1");
         }
+        if(nameLevel == "Level4")
+        {
+             SceneManager.LoadScene("TitleScreen");
+        }
     
     }
 }
