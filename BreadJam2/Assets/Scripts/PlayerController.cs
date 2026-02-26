@@ -135,5 +135,9 @@ private void OnTriggerEnter2D(Collider2D other)
         {
               SceneManager.LoadScene("Level2");
         }
+        if(other.CompareTag("DEAD"))
+        {
+              SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 }
