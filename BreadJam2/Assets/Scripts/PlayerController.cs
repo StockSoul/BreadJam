@@ -17,6 +17,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
     public bool isGrounded;
     bool isRoof;
     bool isForwardDirection;
+   public Animator animator;
 
     [Header("Sounds")]
     public AudioSource jump, dash;
@@ -32,30 +33,38 @@ public class NewMonoBehaviourScript : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
         setMovement();
+        
     }
 
-    void setMovement()
+    private void FixedUpdate()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
-        if (Input.GetKey(KeyCode.D))
-        {
-            isForwardDirection = true;
-            playerRigidbody.linearVelocity = new Vector2(GetHorizontalSpeed(), playerRigidbody.linearVelocity.y);
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            isForwardDirection = false;
-            playerRigidbody.linearVelocity = new Vector2(-GetHorizontalSpeed(), playerRigidbody.linearVelocity.y);
-        }
-        spriteRenderer.flipX = isForwardDirection;
-        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
-        {
-            playerRigidbody.linearVelocity = new Vector2(playerRigidbody.linearVelocity.x, 10.0f);
-            //jump.Play();
-        }
+      animator.SetFloat("xVelocity", Mathf.Abs(playerRigidbody.linearVelocity.x));
     }
-    float GetHorizontalSpeed()
+
+   void setMovement()
+{
+    isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
+
+    float moveInput = 0f;
+
+    if (Input.GetKey(KeyCode.D))
     {
-        return Math.Abs(playerRigidbody.linearVelocity.x) > 10.0f ? Math.Abs(playerRigidbody.linearVelocity.x) : 10.0f;
+        moveInput = 1f;
+        isForwardDirection = true;
     }
+    else if (Input.GetKey(KeyCode.A))
+    {
+        moveInput = -1f;
+        isForwardDirection = false;
+    }
+
+    playerRigidbody.linearVelocity = new Vector2(moveInput * 5f, playerRigidbody.linearVelocity.y);
+
+    spriteRenderer.flipX = !isForwardDirection;
+
+    if (Input.GetKeyDown(KeyCode.W) && isGrounded)
+    {
+        playerRigidbody.linearVelocity = new Vector2(playerRigidbody.linearVelocity.x, 10f);
+    }
+}
 }
