@@ -17,6 +17,8 @@ public class NewMonoBehaviourScript : MonoBehaviour
     public bool isGrounded;
     bool isRoof;
     bool isForwardDirection;
+     //How much big character
+    public float scaleMultiplier;
    public Animator animator;
 
     [Header("Sounds")]
@@ -33,14 +35,37 @@ public class NewMonoBehaviourScript : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
         setMovement();
-        
+    
     }
 
     private void FixedUpdate()
     {
       animator.SetFloat("xVelocity", Mathf.Abs(playerRigidbody.linearVelocity.x));
     }
+  void  GetBig()
+     {
+       
+Collider2D col = GetComponent<Collider2D>();
 
+float heightBefore = col.bounds.size.y; //collider height
+
+transform.localScale *= scaleMultiplier; //x height
+
+float heightAfter = col.bounds.size.y;  // collider height after
+float heightDifference = heightAfter - heightBefore; //collider fixed
+
+transform.position += new Vector3(0, heightDifference / 2f, 0); //player moves up to it grows up
+
+playerRigidbody.mass = 5f; // more heavy so it can MOVE STUFF
+
+//  FIX GROUND CHECK
+Transform groundCheck = transform.Find("GroundCheck");
+groundCheck.localPosition = new Vector3(
+    groundCheck.localPosition.x,
+    groundCheck.localPosition.y / scaleMultiplier,
+    groundCheck.localPosition.z
+);
+     }
    void setMovement()
 {
     isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
@@ -67,4 +92,13 @@ public class NewMonoBehaviourScript : MonoBehaviour
         playerRigidbody.linearVelocity = new Vector2(playerRigidbody.linearVelocity.x, 10f);
     }
 }
+
+private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Water"))
+        {
+            Destroy(other.gameObject);
+            GetBig();
+        }
+    }
 }
