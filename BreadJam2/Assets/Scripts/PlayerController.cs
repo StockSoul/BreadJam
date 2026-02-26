@@ -163,6 +163,10 @@ private void OnTriggerEnter2D(Collider2D other)
         }
         if(nameLevel == "Level4")
         {
+             SceneManager.LoadScene("CREDITS");
+        }
+         if(nameLevel == "CREDITS")
+        {
              SceneManager.LoadScene("TitleScreen");
         }
     
