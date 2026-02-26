@@ -159,7 +159,7 @@ private void OnTriggerEnter2D(Collider2D other)
         }
          if(nameLevel == "Level3")
         {
-             SceneManager.LoadScene("Level1");
+             SceneManager.LoadScene("Level4");
         }
         if(nameLevel == "Level4")
         {
